@@ -3,9 +3,8 @@
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Brain, Zap, Shield } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -18,105 +17,75 @@ export default function Home() {
   }, [isSignedIn, isLoaded, router]);
 
   if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 pt-20 pb-32">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-4xl mx-auto"
-        >
-          {/* Icon */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-            className="inline-block mb-6"
-          >
-            <div className="relative">
-              <Brain className="w-20 h-20 text-primary mx-auto" />
-              <Sparkles className="w-8 h-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
-            </div>
-          </motion.div>
+    <div className="min-h-screen">
+      {/* Header */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Notes Guru</h1>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Button variant="ghost" onClick={() => router.push("/sign-in")}>
+              Sign In
+            </Button>
+            <Button onClick={() => router.push("/sign-up")}>Get Started</Button>
+          </div>
+        </div>
+      </header>
 
-          {/* Heading */}
-          <h1 className="text-6xl md:text-7xl font-bold mb-6">
-            <span className="gradient-text">Smart Notes</span>
-            <br />
-            <span className="text-foreground">Powered by AI</span>
+      {/* Hero Section */}
+      <main className="container mx-auto px-4 py-24 max-w-4xl">
+        <div className="text-center space-y-8">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+            Smart Notes with AI
           </h1>
 
-          {/* Subheading */}
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Transform your learning with AI-powered note-taking. Get instant
-            summaries, ask questions, and unlock insights from your notes.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Create, organize, and learn from your notes with AI-powered
+            summaries and insights.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex gap-4 justify-center">
-            <Button
-              size="lg"
-              onClick={() => router.push("/sign-up")}
-              className="text-lg px-8 py-6"
-            >
-              Get Started Free
-              <Sparkles className="ml-2 w-5 h-5" />
+          <div className="flex gap-4 justify-center pt-4">
+            <Button size="lg" onClick={() => router.push("/sign-up")}>
+              Get Started
             </Button>
             <Button
               size="lg"
               variant="outline"
               onClick={() => router.push("/sign-in")}
-              className="text-lg px-8 py-6"
             >
               Sign In
             </Button>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Features Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="grid md:grid-cols-3 gap-6 mt-32 max-w-5xl mx-auto"
-        >
-          {/* Feature 1 */}
-          <div className="glass p-6 rounded-xl">
-            <Zap className="w-12 h-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">AI Summaries</h3>
-            <p className="text-muted-foreground">
-              Get instant AI-generated summaries of your notes for quick reviews
+        {/* Features */}
+        <div className="grid md:grid-cols-3 gap-8 mt-24">
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg">AI Summaries</h3>
+            <p className="text-muted-foreground text-sm">
+              Get instant summaries of your notes
             </p>
           </div>
 
-          {/* Feature 2 */}
-          <div className="glass p-6 rounded-xl">
-            <Brain className="w-12 h-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Smart Q&A</h3>
-            <p className="text-muted-foreground">
-              Ask questions and get contextual answers from your notes
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg">Smart Q&A</h3>
+            <p className="text-muted-foreground text-sm">
+              Ask questions about your notes
             </p>
           </div>
 
-          {/* Feature 3 */}
-          <div className="glass p-6 rounded-xl">
-            <Shield className="w-12 h-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Organized</h3>
-            <p className="text-muted-foreground">
-              Topic-based organization with tags for easy retrieval
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg">Organized</h3>
+            <p className="text-muted-foreground text-sm">
+              Topic-based organization with tags
             </p>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
