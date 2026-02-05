@@ -21,6 +21,7 @@ mongoose
 
 // Import routes
 const noteRoutes = require("./routes/noteRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 // Test route
 app.get("/", (req, res) => {
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/api/notes", noteRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
