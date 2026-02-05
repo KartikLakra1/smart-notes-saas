@@ -3,10 +3,12 @@ const Note = require("../models/Note");
 // Get all notes for a user
 exports.getNotes = async (req, res) => {
   try {
+    console.log("Fetching notes for user:", req.userId);
     const notes = await Note.find({ userId: req.userId }).sort({
       updatedAt: -1,
     });
 
+    console.log("Found notes:", notes.length);
     res.json(notes);
   } catch (error) {
     console.error("Get notes error:", error);
@@ -36,7 +38,14 @@ exports.getNote = async (req, res) => {
 // Create new note
 exports.createNote = async (req, res) => {
   try {
+    console.log("Creating note for user:", req.userId);
+    console.log("Note data:", req.body);
+
     const { title, content, topic, tags } = req.body;
+
+    if (!title || !content || !topic) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
     const note = new Note({
       userId: req.userId,
@@ -47,6 +56,7 @@ exports.createNote = async (req, res) => {
     });
 
     await note.save();
+    console.log("Note created successfully:", note._id);
     res.status(201).json(note);
   } catch (error) {
     console.error("Create note error:", error);
