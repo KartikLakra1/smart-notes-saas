@@ -19,10 +19,16 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
+// Import routes
+const noteRoutes = require("./routes/noteRoutes");
+
 // Test route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Notes Guru API!" });
 });
+
+// API routes
+app.use("/api/notes", noteRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
