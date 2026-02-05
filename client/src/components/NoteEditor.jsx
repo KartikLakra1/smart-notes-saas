@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Save, Trash2, X, Sparkles } from "lucide-react";
+import AIPanel from "./AIPanel";
 
 export default function NoteEditor() {
   const { getToken } = useAuth();
@@ -25,6 +26,7 @@ export default function NoteEditor() {
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
+  const [showAI, setShowAI] = useState(false);
 
   useEffect(() => {
     if (selectedNote) {
@@ -72,101 +74,111 @@ export default function NoteEditor() {
   if (!selectedNote) return null;
 
   return (
-    <div className="flex-1 flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => dispatch(clearSelectedNote())}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            {hasChanges ? "Unsaved changes" : "Saved"}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" disabled>
-            <Sparkles className="h-4 w-4 mr-1" />
-            AI Tools
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-          <Button size="sm" onClick={handleSave} disabled={!hasChanges}>
-            <Save className="h-4 w-4 mr-1" />
-            Save
-          </Button>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {/* Title */}
-        <Input
-          placeholder="Note title"
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-            setHasChanges(true);
-          }}
-          className="text-2xl font-semibold border-0 px-0 focus-visible:ring-0"
-        />
-
-        {/* Topic */}
-        <Input
-          placeholder="Topic"
-          value={topic}
-          onChange={(e) => {
-            setTopic(e.target.value);
-            setHasChanges(true);
-          }}
-          className="border-0 px-0 focus-visible:ring-0"
-        />
-
-        {/* Tags */}
-        <div className="space-y-2">
-          <div className="flex gap-2 flex-wrap">
-            {tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="gap-1">
-                {tag}
-                <button
-                  onClick={() => handleRemoveTag(tag)}
-                  className="ml-1 hover:text-destructive"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
+    <div className="flex-1 flex">
+      {/* Note Content */}
+      <div className={`flex-1 flex flex-col ${showAI ? "border-r" : ""}`}>
+        {/* Header */}
+        <div className="p-4 border-b flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => dispatch(clearSelectedNote())}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {hasChanges ? "Unsaved changes" : "Saved"}
+            </span>
           </div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Add tag"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
-              className="max-w-xs"
-            />
-            <Button size="sm" variant="outline" onClick={handleAddTag}>
-              Add
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant={showAI ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setShowAI(!showAI)}
+            >
+              <Sparkles className="h-4 w-4 mr-1" />
+              AI Tools
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleDelete}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            <Button size="sm" onClick={handleSave} disabled={!hasChanges}>
+              <Save className="h-4 w-4 mr-1" />
+              Save
             </Button>
           </div>
         </div>
 
         {/* Content */}
-        <Textarea
-          placeholder="Start writing..."
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value);
-            setHasChanges(true);
-          }}
-          className="min-h-[400px] border-0 px-0 focus-visible:ring-0 resize-none"
-        />
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <Input
+            placeholder="Note title"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setHasChanges(true);
+            }}
+            className="text-2xl font-semibold border-0 px-0 focus-visible:ring-0"
+          />
+
+          <Input
+            placeholder="Topic"
+            value={topic}
+            onChange={(e) => {
+              setTopic(e.target.value);
+              setHasChanges(true);
+            }}
+            className="border-0 px-0 focus-visible:ring-0"
+          />
+
+          <div className="space-y-2">
+            <div className="flex gap-2 flex-wrap">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="gap-1">
+                  {tag}
+                  <button
+                    onClick={() => handleRemoveTag(tag)}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add tag"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
+                className="max-w-xs"
+              />
+              <Button size="sm" variant="outline" onClick={handleAddTag}>
+                Add
+              </Button>
+            </div>
+          </div>
+
+          <Textarea
+            placeholder="Start writing..."
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+              setHasChanges(true);
+            }}
+            className="min-h-[400px] border-0 px-0 focus-visible:ring-0 resize-none"
+          />
+        </div>
       </div>
+
+      {/* AI Panel */}
+      {showAI && (
+        <div className="w-96">
+          <AIPanel noteId={selectedNote._id} noteContent={content} />
+        </div>
+      )}
     </div>
   );
 }
