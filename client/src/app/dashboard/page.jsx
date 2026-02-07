@@ -7,10 +7,11 @@ import {
   fetchNotes,
   setSelectedNote,
   clearSelectedNote,
-} from "../store/notesSlice";
+} from "@/store/notesSlice";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import NotesList from "@/components/NotesList";
 import NoteEditor from "@/components/NoteEditor";
 import CreateNoteDialog from "@/components/CreateNoteDialog";
@@ -66,12 +67,20 @@ export default function DashboardPage() {
         {/* Notes List */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="p-4 text-center text-muted-foreground">
-              Loading notes...
+            <div className="p-4 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              ))}
             </div>
           ) : filteredNotes.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">
-              {searchQuery ? "No notes found" : "No notes yet"}
+            <div className="p-4 text-center text-muted-foreground text-sm">
+              {searchQuery
+                ? "No notes found"
+                : "No notes yet. Create your first note!"}
             </div>
           ) : (
             <NotesList

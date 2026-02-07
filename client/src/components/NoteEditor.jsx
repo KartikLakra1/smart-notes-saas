@@ -3,11 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateNote,
-  deleteNote,
-  clearSelectedNote,
-} from "../app/store/notesSlice";
+import { updateNote, deleteNote, clearSelectedNote } from "../store/notesSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

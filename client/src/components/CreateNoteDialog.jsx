@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useDispatch } from "react-redux";
-import { createNote } from "../app/store/notesSlice";
+import { createNote } from "../store/notesSlice";
 import {
   Dialog,
   DialogContent,
