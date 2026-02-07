@@ -79,7 +79,7 @@ export default function NoteEditor() {
   if (!selectedNote) return null;
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row h-full overflow-scroll">
       {/* Note Content */}
       <div
         className={`flex-1 flex flex-col ${showAI ? "md:border-r" : ""} min-w-0`}

@@ -51,7 +51,7 @@ export default function DashboardPage() {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden absolute top-4 left-4 z-50"
+        className="md:hidden absolute top-0 left-0 z-50"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
         {isSidebarOpen ? (
@@ -131,7 +131,7 @@ export default function DashboardPage() {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col w-full h-full">
+      <div className="flex-1 flex flex-col w-full min-h-full">
         {selectedNote ? (
           <NoteEditor />
         ) : (
