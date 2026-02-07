@@ -9,7 +9,7 @@ import {
   clearSelectedNote,
 } from "@/store/notesSlice";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Menu, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotesList from "@/components/NotesList";
@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const { notes, selectedNote, loading } = useSelector((state) => state.notes);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -31,6 +32,12 @@ export default function DashboardPage() {
     loadNotes();
   }, [dispatch, getToken]);
 
+  useEffect(() => {
+    if (selectedNote && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  }, [selectedNote]);
+
   const filteredNotes = notes.filter(
     (note) =>
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,11 +46,34 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex">
+    <div className="h-full flex relative">
+      {/* Mobile Menu Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden absolute top-4 left-4 z-50"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        {isSidebarOpen ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <Menu className="h-5 w-5" />
+        )}
+      </Button>
+
       {/* Sidebar */}
-      <div className="w-80 border-r flex flex-col">
+      <div
+        className={`
+          fixed md:relative inset-y-0 left-0 z-40
+          w-80 border-r flex flex-col bg-background
+          transform transition-transform duration-200 ease-in-out
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+          h-full
+        `}
+      >
         {/* Header */}
-        <div className="p-4 border-b space-y-3">
+        <div className="p-4 border-b space-y-3 mt-14 md:mt-0">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">Notes</h2>
             <Button size="sm" onClick={() => setIsCreateDialogOpen(true)}>
@@ -92,15 +122,30 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full h-full">
         {selectedNote ? (
           <NoteEditor />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center text-muted-foreground p-4">
             <div className="text-center space-y-2">
               <p>Select a note to view</p>
               <p className="text-sm">or create a new one</p>
+              <Button
+                className="mt-4 md:hidden"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <Menu className="h-4 w-4 mr-2" />
+                View Notes
+              </Button>
             </div>
           </div>
         )}

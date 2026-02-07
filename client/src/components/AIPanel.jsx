@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles, Send, Loader2, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -19,14 +20,12 @@ export default function AIPanel({ noteId, noteContent }) {
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Load chat history
   useEffect(() => {
     if (noteId) {
       loadChatHistory();
     }
   }, [noteId]);
 
-  // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -53,9 +52,10 @@ export default function AIPanel({ noteId, noteContent }) {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setSummary(response.data.summary);
+      toast.success("Summary generated successfully");
     } catch (error) {
       console.error("Generate summary error:", error);
-      alert("Failed to generate summary");
+      toast.error("Failed to generate summary");
     } finally {
       setLoadingSummary(false);
     }
@@ -67,7 +67,6 @@ export default function AIPanel({ noteId, noteContent }) {
     const userMessage = inputMessage;
     setInputMessage("");
 
-    // Add user message immediately
     const newMessages = [...messages, { role: "user", content: userMessage }];
     setMessages(newMessages);
 
@@ -80,37 +79,36 @@ export default function AIPanel({ noteId, noteContent }) {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      // Add AI response
       setMessages([
         ...newMessages,
         { role: "assistant", content: response.data.response },
       ]);
     } catch (error) {
       console.error("Send message error:", error);
-      alert("Failed to send message");
+      toast.error("Failed to send message");
     } finally {
       setSendingMessage(false);
     }
   };
 
   const handleClearChat = async () => {
-    if (!confirm("Clear chat history?")) return;
-
     try {
       const token = await getToken();
       await axios.delete(`${API_URL}/api/ai/chat/${noteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages([]);
+      toast.success("Chat history cleared");
     } catch (error) {
       console.error("Clear chat error:", error);
+      toast.error("Failed to clear chat");
     }
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-[400px] md:h-full flex flex-col">
       {/* Summary Section */}
-      <div className="p-4 border-b space-y-3">
+      <div className="p-3 md:p-4 border-b space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-sm">AI Summary</h3>
           <Button
@@ -124,12 +122,12 @@ export default function AIPanel({ noteId, noteContent }) {
             ) : (
               <Sparkles className="h-3 w-3 mr-1" />
             )}
-            Generate
+            <span className="text-xs">Generate</span>
           </Button>
         </div>
 
         {summary && (
-          <div className="text-sm text-muted-foreground bg-accent p-3 rounded">
+          <div className="text-xs md:text-sm text-muted-foreground bg-accent p-3 rounded">
             {summary}
           </div>
         )}
@@ -138,9 +136,9 @@ export default function AIPanel({ noteId, noteContent }) {
       <Separator />
 
       {/* Chat Section */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Chat Header */}
-        <div className="p-4 border-b flex items-center justify-between">
+        <div className="p-3 md:p-4 border-b flex items-center justify-between">
           <h3 className="font-semibold text-sm">Ask Questions</h3>
           {messages.length > 0 && (
             <Button size="sm" variant="ghost" onClick={handleClearChat}>
@@ -150,9 +148,9 @@ export default function AIPanel({ noteId, noteContent }) {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center text-muted-foreground text-sm">
+            <div className="text-center text-muted-foreground text-xs md:text-sm">
               Ask questions about this note
             </div>
           ) : (
@@ -162,7 +160,7 @@ export default function AIPanel({ noteId, noteContent }) {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] rounded p-3 text-sm ${
+                  className={`max-w-[85%] md:max-w-[80%] rounded p-2 md:p-3 text-xs md:text-sm ${
                     msg.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-accent"
@@ -175,7 +173,7 @@ export default function AIPanel({ noteId, noteContent }) {
           )}
           {sendingMessage && (
             <div className="flex justify-start">
-              <div className="bg-accent rounded p-3 text-sm">
+              <div className="bg-accent rounded p-2 md:p-3 text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" />
               </div>
             </div>
@@ -184,7 +182,7 @@ export default function AIPanel({ noteId, noteContent }) {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t">
+        <div className="p-3 md:p-4 border-t">
           <div className="flex gap-2">
             <Input
               placeholder="Ask a question..."
@@ -192,6 +190,7 @@ export default function AIPanel({ noteId, noteContent }) {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
               disabled={sendingMessage}
+              className="text-sm"
             />
             <Button
               size="icon"

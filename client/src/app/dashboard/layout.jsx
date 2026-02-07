@@ -11,9 +11,9 @@ export default async function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1">{children}</div>
+      <main className="flex-1 overflow-hidden">{children}</main>
       <Footer />
     </div>
   );

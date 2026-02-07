@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useDispatch } from "react-redux";
-import { createNote } from "../store/notesSlice";
+import { createNote } from "@/store/notesSlice";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 export default function CreateNoteDialog({ open, onOpenChange }) {
   const { getToken } = useAuth();
@@ -22,23 +23,40 @@ export default function CreateNoteDialog({ open, onOpenChange }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [topic, setTopic] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreate = async () => {
-    if (!title.trim() || !content.trim() || !topic.trim()) return;
+    if (!title.trim() || !content.trim() || !topic.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-    const token = await getToken();
-    await dispatch(
-      createNote({
-        noteData: { title, content, topic, tags: [] },
-        token,
-      }),
-    );
+    try {
+      setIsSubmitting(true);
+      const token = await getToken();
 
-    // Reset and close
-    setTitle("");
-    setContent("");
-    setTopic("");
-    onOpenChange(false);
+      const result = await dispatch(
+        createNote({
+          noteData: { title, content, topic, tags: [] },
+          token,
+        }),
+      );
+
+      if (result.type === "notes/createNote/fulfilled") {
+        setTitle("");
+        setContent("");
+        setTopic("");
+        onOpenChange(false);
+        toast.success("Note created successfully");
+      } else {
+        toast.error("Failed to create note");
+      }
+    } catch (error) {
+      console.error("Error creating note:", error);
+      toast.error("Failed to create note");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -82,14 +100,20 @@ export default function CreateNoteDialog({ open, onOpenChange }) {
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleCreate}
-            disabled={!title.trim() || !content.trim() || !topic.trim()}
+            disabled={
+              !title.trim() || !content.trim() || !topic.trim() || isSubmitting
+            }
           >
-            Create Note
+            {isSubmitting ? "Creating..." : "Create Note"}
           </Button>
         </div>
       </DialogContent>
